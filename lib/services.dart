@@ -9,7 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
+// import 'package:url_launcher/url_launcher.dart';
 import 'models.dart';
 
 // ========== SINGLETON SERVICES ==========
@@ -519,17 +519,18 @@ class PaystackService {
     required int amount,
     required Function(String reference) onSuccess,
   }) {
+    // TODO: Fix after build works
     // Convert amount to kobo (Paystack uses kobo)
-    final amountInKobo = amount * 100;
+    // final amountInKobo = amount * 100;
     
     // Build Paystack URL
-    final url = 'https://checkout.paystack.com/${Uri.encodeComponent(paystackPublicKey)}?'
-        'email=${Uri.encodeComponent(email)}&'
-        'amount=$amountInKobo&'
-        'currency=NGN';
+    // final url = 'https://checkout.paystack.com/${Uri.encodeComponent(paystackPublicKey)}?'
+    //     'email=${Uri.encodeComponent(email)}&'
+    //     'amount=$amountInKobo&'
+    //     'currency=NGN';
     
-    // Launch URL (Paystack will handle callback via URL scheme)
-    launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    // Launch URL
+    // launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
   }
 }
 
