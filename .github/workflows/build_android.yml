@@ -1,7 +1,7 @@
 name: Build Android APK
 
 on:
-  workflow_dispatch:  # MANUAL ONLY - Remove 'push' trigger
+  workflow_dispatch:
 
 jobs:
   build:
@@ -18,6 +18,11 @@ jobs:
         with:
           flutter-version: '3.24.0'
           channel: 'stable'
+      
+      - name: Create Flutter project structure
+        run: |
+          # Create android folder if it doesn't exist
+          flutter create --platforms=android .
       
       - run: flutter pub get
       
