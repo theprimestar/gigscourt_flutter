@@ -22,19 +22,6 @@ jobs:
       - name: Create Flutter project structure
         run: flutter create --platforms=android .
       
-      - name: Upgrade Gradle Configuration (Verified Fix)
-        run: |
-          # Update gradle-wrapper.properties to Gradle 7.4
-          sed -i 's|gradle-.*-all.zip|gradle-7.4-all.zip|g' android/gradle/wrapper/gradle-wrapper.properties
-          
-          # Update Android Gradle Plugin to 7.1.2
-          sed -i 's|com.android.tools.build:gradle:.*|com.android.tools.build:gradle:7.1.2|g' android/build.gradle
-          
-          # Force compileSdkVersion and targetSdkVersion to 33
-          sed -i 's/compileSdkVersion flutter.compileSdkVersion/compileSdkVersion 33/g' android/app/build.gradle
-          sed -i 's/targetSdkVersion flutter.targetSdkVersion/targetSdkVersion 33/g' android/app/build.gradle
-          sed -i 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 21/g' android/app/build.gradle
-      
       - run: flutter pub get
       
       - name: Build APK
