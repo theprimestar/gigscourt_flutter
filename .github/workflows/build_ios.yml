@@ -1,9 +1,7 @@
 name: Build iOS IPA for Scarlet
 
 on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+  workflow_dispatch:  # MANUAL ONLY - Remove 'push' trigger
 
 jobs:
   build:
