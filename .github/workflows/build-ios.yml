@@ -50,21 +50,33 @@ jobs:
       - name: Get Flutter dependencies
         run: flutter pub get
 
-      - name: Build iOS app (Generic Device - No Signing)
+      - name: Prepare iOS project with Flutter
+        run: |
+          flutter build ios --release --no-codesign --target=lib/main.dart || true
+          echo "Flutter prepare completed (build may fail but project is now configured)"
+
+      - name: Build iOS app archive (No Signing)
         run: |
           cd ios
-          xcodebuild -workspace Runner.xcworkspace \
+          
+          # Clean any previous builds
+          rm -rf build/
+          
+          # Archive without signing
+          xcodebuild archive \
+            -workspace Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \
             -sdk iphoneos \
             -destination 'generic/platform=iOS' \
             -archivePath ./build/Runner.xcarchive \
-            archive \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
             DEVELOPMENT_TEAM="" \
-            PROVISIONING_PROFILE_SPECIFIER=""
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            SWIFT_VERSION=5.0 \
+            COMPILER_INDEX_STORE_ENABLE=NO
           cd ..
 
       - name: Create unsigned IPA
