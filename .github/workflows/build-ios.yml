@@ -55,9 +55,22 @@ jobs:
 
       - name: Build unsigned iOS IPA
         run: |
-          flutter build ios --release --no-codesign
+          cd ios
+          pod install || true
+          xcodebuild clean build \
+            -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath ./build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            DEVELOPMENT_TEAM="" \
+            PROVISIONING_PROFILE_SPECIFIER=""
+          cd ..
           mkdir -p Payload
-          cp -r build/ios/iphoneos/Runner.app Payload/
+          cp -r ios/build/Build/Products/Release-iphoneos/Runner.app Payload/
           zip -r gigscourt-unsigned.ipa Payload/
           mkdir -p output
           mv gigscourt-unsigned.ipa output/
