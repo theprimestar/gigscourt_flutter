@@ -18,14 +18,40 @@ jobs:
           flutter-version: '3.24.0'
           channel: 'stable'
 
+      - name: Enable iOS platform
+        run: flutter config --enable-ios
+
+      - name: Create iOS project
+        run: |
+          flutter create --platforms=ios .
+          sed -i '' 's/PRODUCT_BUNDLE_IDENTIFIER = .*;/PRODUCT_BUNDLE_IDENTIFIER = com.gigscourt.app;/g' ios/Runner.xcodeproj/project.pbxproj
+
+      - name: Install FlutterFire CLI
+        run: dart pub global activate flutterfire_cli
+
+      - name: Generate firebase_options.dart
+        run: |
+          echo "import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;" > lib/firebase_options.dart
+          echo "" >> lib/firebase_options.dart
+          echo "class DefaultFirebaseOptions {" >> lib/firebase_options.dart
+          echo "  static FirebaseOptions get currentPlatform {" >> lib/firebase_options.dart
+          echo "    return const FirebaseOptions(" >> lib/firebase_options.dart
+          echo "      apiKey: 'AIzaSyAOVhUZ3cFzrN9YiLdKL2bnW8dKKAt8gVQ'," >> lib/firebase_options.dart
+          echo "      authDomain: 'gigscourt2.firebaseapp.com'," >> lib/firebase_options.dart
+          echo "      projectId: 'gigscourt2'," >> lib/firebase_options.dart
+          echo "      storageBucket: 'gigscourt2.appspot.com'," >> lib/firebase_options.dart
+          echo "      messagingSenderId: '505136313803'," >> lib/firebase_options.dart
+          echo "      appId: '1:505136313803:ios:36d02056936ff71b23324e'," >> lib/firebase_options.dart
+          echo "      iosBundleId: 'com.gigscourt.app'," >> lib/firebase_options.dart
+          echo "    );" >> lib/firebase_options.dart
+          echo "  }" >> lib/firebase_options.dart
+          echo "}" >> lib/firebase_options.dart
+
       - name: Get Flutter dependencies
         run: flutter pub get
 
       - name: Build iOS app (Generic Device - No Signing)
         run: |
-          flutter build ios --release --no-codesign --target=lib/main.dart
-          
-          # Alternative approach if above fails: build for generic device
           cd ios
           xcodebuild -workspace Runner.xcworkspace \
             -scheme Runner \
@@ -39,15 +65,11 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             DEVELOPMENT_TEAM="" \
             PROVISIONING_PROFILE_SPECIFIER=""
-          
           cd ..
 
       - name: Create unsigned IPA
         run: |
-          # Check if .app exists from flutter build
-          if [ -d "build/ios/iphoneos/Runner.app" ]; then
-            APP_PATH="build/ios/iphoneos/Runner.app"
-          elif [ -d "ios/build/Runner.xcarchive/Products/Applications/Runner.app" ]; then
+          if [ -d "ios/build/Runner.xcarchive/Products/Applications/Runner.app" ]; then
             APP_PATH="ios/build/Runner.xcarchive/Products/Applications/Runner.app"
           else
             echo "❌ Could not find Runner.app"
