@@ -8,12 +8,7 @@ flutter create --platforms=ios .
 # Ensure the bundle identifier is set correctly
 sed -i '' 's/PRODUCT_BUNDLE_IDENTIFIER = .*;/PRODUCT_BUNDLE_IDENTIFIER = com.gigscourt.app;/g' ios/Runner.xcodeproj/project.pbxproj
 
-# CRITICAL FIX: Inject a placeholder Development Team ID for free accounts
-# This satisfies Xcode's requirement without needing a paid account
-sed -i '' 's/DEVELOPMENT_TEAM = "";/DEVELOPMENT_TEAM = "0000000000";/g' ios/Runner.xcodeproj/project.pbxproj
-sed -i '' 's/DEVELOPMENT_TEAM = .*;/DEVELOPMENT_TEAM = "0000000000";/g' ios/Runner.xcodeproj/project.pbxproj
-
 # Ensure display name is set correctly
 /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName GigsCourt" ios/Runner/Info.plist 2>/dev/null || true
 
-echo "✅ iOS project prepared successfully with placeholder Team ID"
+echo "✅ iOS project prepared successfully"
