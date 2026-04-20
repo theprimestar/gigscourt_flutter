@@ -26,77 +26,20 @@ jobs:
           flutter create --platforms=ios .
           sed -i '' 's/PRODUCT_BUNDLE_IDENTIFIER = .*;/PRODUCT_BUNDLE_IDENTIFIER = com.gigscourt.app;/g' ios/Runner.xcodeproj/project.pbxproj
 
-      - name: Install FlutterFire CLI
-        run: dart pub global activate flutterfire_cli
-
-      - name: Generate firebase_options.dart
-        run: |
-          echo "import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;" > lib/firebase_options.dart
-          echo "" >> lib/firebase_options.dart
-          echo "class DefaultFirebaseOptions {" >> lib/firebase_options.dart
-          echo "  static FirebaseOptions get currentPlatform {" >> lib/firebase_options.dart
-          echo "    return const FirebaseOptions(" >> lib/firebase_options.dart
-          echo "      apiKey: 'AIzaSyAOVhUZ3cFzrN9YiLdKL2bnW8dKKAt8gVQ'," >> lib/firebase_options.dart
-          echo "      authDomain: 'gigscourt2.firebaseapp.com'," >> lib/firebase_options.dart
-          echo "      projectId: 'gigscourt2'," >> lib/firebase_options.dart
-          echo "      storageBucket: 'gigscourt2.appspot.com'," >> lib/firebase_options.dart
-          echo "      messagingSenderId: '505136313803'," >> lib/firebase_options.dart
-          echo "      appId: '1:505136313803:ios:36d02056936ff71b23324e'," >> lib/firebase_options.dart
-          echo "      iosBundleId: 'com.gigscourt.app'," >> lib/firebase_options.dart
-          echo "    );" >> lib/firebase_options.dart
-          echo "  }" >> lib/firebase_options.dart
-          echo "}" >> lib/firebase_options.dart
-
       - name: Get Flutter dependencies
         run: flutter pub get
 
-      - name: Prepare iOS project with Flutter
+      - name: Build for iOS Simulator
         run: |
-          flutter build ios --release --no-codesign --target=lib/main.dart || true
-          echo "Flutter prepare completed"
-
-      - name: Build iOS app archive (No Signing)
-        run: |
-          cd ios
-          rm -rf build/
-          rm -rf ~/Library/Developer/Xcode/DerivedData/*
-          xcodebuild archive \
-            -workspace Runner.xcworkspace \
-            -scheme Runner \
-            -configuration Release \
-            -sdk iphoneos \
-            -destination 'generic/platform=iOS' \
-            -archivePath ./build/Runner.xcarchive \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            DEVELOPMENT_TEAM="" \
-            PROVISIONING_PROFILE_SPECIFIER="" \
-            SWIFT_VERSION=5.0 \
-            COMPILER_INDEX_STORE_ENABLE=NO \
-            CLANG_ENABLE_MODULE_DEBUGGING=NO \
-            VALIDATE_WORKSPACE=NO \
-            VALIDATE_DEVELOPMENT_ASSET_PATHS=NO \
-            USE_EXPLICIT_MODULES=NO \
-            CLANG_ENABLE_MODULES=YES
-          cd ..
-
-      - name: Create unsigned IPA
-        run: |
-          if [ -d "ios/build/Runner.xcarchive/Products/Applications/Runner.app" ]; then
-            APP_PATH="ios/build/Runner.xcarchive/Products/Applications/Runner.app"
-          else
-            echo "❌ Could not find Runner.app"
-            exit 1
-          fi
+          flutter build ios --simulator --release --no-codesign
           
-          echo "📱 Found app at: $APP_PATH"
           mkdir -p Payload
-          cp -r "$APP_PATH" Payload/
+          cp -r build/ios/iphonesimulator/Runner.app Payload/
           zip -r gigscourt-unsigned.ipa Payload/
           mkdir -p output
           mv gigscourt-unsigned.ipa output/
-          echo "✅ IPA created"
+          
+          echo "✅ Simulator IPA created"
 
       - name: Upload IPA as artifact
         uses: actions/upload-artifact@v4
