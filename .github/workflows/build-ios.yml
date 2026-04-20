@@ -58,11 +58,7 @@ jobs:
       - name: Build iOS app archive (No Signing)
         run: |
           cd ios
-          
-          # Clean any previous builds
           rm -rf build/
-          
-          # Archive without signing
           xcodebuild archive \
             -workspace Runner.xcworkspace \
             -scheme Runner \
@@ -76,7 +72,10 @@ jobs:
             DEVELOPMENT_TEAM="" \
             PROVISIONING_PROFILE_SPECIFIER="" \
             SWIFT_VERSION=5.0 \
-            COMPILER_INDEX_STORE_ENABLE=NO
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            CLANG_ENABLE_MODULE_DEBUGGING=NO \
+            VALIDATE_WORKSPACE=NO \
+            VALIDATE_DEVELOPMENT_ASSET_PATHS=NO
           cd ..
 
       - name: Create unsigned IPA
